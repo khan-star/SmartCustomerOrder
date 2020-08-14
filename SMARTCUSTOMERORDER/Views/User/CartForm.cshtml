@@ -1,0 +1,77 @@
+﻿@using SMARTCUSTOMERORDER.Models;
+@model UserContactDetails
+@{
+    ViewData["Title"] = "CartForm";
+}
+<div class="panel panel-primary" id="divCartForm">
+    <div class="panel-heading">
+        Cart List
+    </div>
+    <div class="panel-body">
+        <div>
+            <table class="table table-striped table-bordered" id="Mytable">
+                <thead>
+                    <tr>                       
+                        <td>Productid</td>
+                        <td>Title</td>
+                        <td>Price</td>
+                        <td>Quantity</td>
+                        <td>Images</td>
+                        <td>Remove</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var items in Model.CartsList)
+                    {
+                        <tr>
+                            <td class="Pid">@items.Productid</td>
+                            <td id="Tit">@items.Title</td>
+                            <td id="Pri">@items.Price</td>
+                            <td id="Qty">@items.TotalQuantity</td>
+                            <td>
+                                @{
+                                    var base64 = Convert.ToBase64String(items.Images);
+                                    var imgsrc = string.Format("data:image/jpg;base64,{0}", base64);
+                                }
+                                <img id="Img" src="@imgsrc" width="200" height="100" />
+                            </td>
+
+                            <td>
+                                <a onclick="Remove(@items.Productid)">Remove</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <link href="~/lib/DataTables-1.10.18/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+    <script src="~/lib/DataTables-1.10.18/js/jquery.dataTables.js"></script>
+    <script src="~/lib/DataTables-1.10.18/js/dataTables.bootstrap.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#Mytable').DataTable();
+        });
+        function Remove(Productid) {
+            $.ajax({
+                url: '@Url.Action("Remove","User")',
+                data: { Productid: Productid },
+
+                success: function (resp) {
+                    console.log(resp);
+                    alert("Are u Sure u want to delete the items");
+                    $('#divCartForm').html(resp);
+                    $('#Mytable').DataTable();
+                },
+                error: function () {
+                    alert("Failed");
+                }
+            });
+        }
+    </script>
+}
+
+
+

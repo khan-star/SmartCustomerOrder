@@ -1,0 +1,105 @@
+﻿@using SMARTCUSTOMERORDER.Models;
+@model UserContactDetails
+@{
+    ViewData["Title"] = "UserMainForm";
+}
+
+<h2>UserMainForm</h2>
+<div id="divUserMainForm">
+    <div id="divUserContact">
+        @{ await Html.RenderPartialAsync("UserContact", Model);}
+    </div>
+    <div id="divUserList">
+        @{ await Html.RenderPartialAsync("UserList", Model);}
+    </div>
+</div>
+
+@section Scripts{
+    <link href="~/lib/DataTables-1.10.18/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+    <script src="~/lib/DataTables-1.10.18/js/jquery.dataTables.js"></script>
+    <script src="~/lib/DataTables-1.10.18/js/dataTables.bootstrap.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#TblUserList').DataTable();
+            Submit();
+        });
+        function Submit() {
+            $('#btnSubmit').click(function () {
+
+                if ($("#UserDataxml_Name").val() == "") {
+                    alert("Name Must be Filled Out");
+                    return false;
+                }
+                if ($("#UserDataxml_Surname").val() == "") {
+                    alert("Surname Must be Filled Out");
+                    return false;
+                }
+                if ($("#UserDataxml_Gender").val() == "") {
+                    alert("Gender Must be Filled Out");
+                    return false;
+                }
+                if ($("#UserDataxml_Email").val() == "") {
+                    alert("Email Must be Filled Out");
+                    return false;
+                }
+                var SN = $('#UserDataxml_SNo').val();
+                var FName = $('#UserDataxml_Name').val();
+                var SName = $('#UserDataxml_Surname').val();
+                var gen = $('#UserDataxml_Gender').val();
+                var EM = $('#UserDataxml_Email').val();
+
+                var Userxml = { SNo: SN, Name: FName, Surname: SName, Gender: gen, Email: EM }
+                console.log(Userxml);
+
+                $.ajax({
+                    url: '@Url.Action("UserContact","User")',
+                    data: Userxml,
+                    success: function (resp) {
+                        console.log(resp);
+                        $('#divUserList').html(resp);
+                        $('#TblUserList').DataTable();
+                        $("#Myform")[0].reset()
+                    },
+                    error: function () {
+                        alert("failed");
+                    }
+                });
+            });
+        }
+
+        function Edit(SNo) {
+            $.ajax({
+                url: '@Url.Action("Edit","User")',
+                data: { SN: SNo },
+                success: function (resp) {
+                    console.log(resp);
+                    $('#divUserContact').html(resp);
+                    Submit();
+                },
+                error: function () {
+                    alert("failed");
+                }
+            });
+        }
+
+        function Delete(SNo) {
+            $.ajax({
+                url: '@Url.Action("Delete","User")',
+                data: { SNo: SNo },
+
+                success: function (resp) {
+                    alert("Are you Sure You Want to Delete");
+                    console.log(resp);
+
+                    $('#divUserList').html(resp);
+                    $('#TblUserList').DataTable();
+
+                },
+                error: function () {
+                    alert("failed");
+                }
+            });
+        }
+    </script>
+}
+
